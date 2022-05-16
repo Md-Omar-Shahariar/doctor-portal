@@ -1,13 +1,43 @@
 import React from "react";
 import { format } from "date-fns";
+import { useAuthState } from "react-firebase-hooks/auth";
+import auth from "../../firebase.init";
+import { toast } from "react-toastify";
+import id from "date-fns/esm/locale/id/index.js";
 
 const BookingModal = ({ treatment, date, setTreatment }) => {
-  const { name, slot, _id } = treatment;
+  const [user, loading, error] = useAuthState(auth);
+  const { name, slots, _id } = treatment;
+  const formattedDate = format(date, "PP");
   const handleBooking = (event) => {
     event.preventDefault();
     const slot = event.target.slot.value;
-    console.log(slot, name, _id);
-    setTreatment(null);
+    console.log(slots, name, _id);
+    const booking = {
+      treatmentId: _id,
+      treatment: name,
+      date: formattedDate,
+      slot,
+      PatientName: user.displayName,
+      phone: event.target.value,
+    };
+    fetch("http://localhost:5000/booking", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(booking),
+    })
+      .then((res) => res.send)
+      .then((data) => {
+        console.log(data);
+        if (data?.success) {
+          toast(`Appointment is set ${formattedDate} at ${slot}`);
+        } else {
+          toast(`Appointment exists  ${formattedDate} at ${slot}`);
+        }
+        setTreatment(null);
+      });
   };
   return (
     <div>
@@ -34,7 +64,7 @@ const BookingModal = ({ treatment, date, setTreatment }) => {
               className="input input-bordered w-full max-w-xs"
             />
             <select name="slot" className="select w-full max-w-xs">
-              {slot.map((slot) => (
+              {slots.map((slot) => (
                 <option>{slot}</option>
               ))}
             </select>
@@ -42,11 +72,15 @@ const BookingModal = ({ treatment, date, setTreatment }) => {
               type="text"
               placeholder="Your Name"
               name="name"
+              value={user.displayName}
+              disabled
               className="input input-bordered w-full max-w-xs"
             />
             <input
               type="email"
               name="email"
+              value={user.email}
+              disabled
               placeholder="Email"
               className="input input-bordered w-full max-w-xs"
             />
