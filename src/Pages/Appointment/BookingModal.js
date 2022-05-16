@@ -28,7 +28,7 @@ const BookingModal = ({ treatment, date, setTreatment }) => {
       },
       body: JSON.stringify(booking),
     })
-      .then((res) => res.send)
+      .then((res) => res.json())
       .then((data) => {
         console.log(data);
         if (data?.success) {
