@@ -5,7 +5,7 @@ import auth from "../../firebase.init";
 import { toast } from "react-toastify";
 import id from "date-fns/esm/locale/id/index.js";
 
-const BookingModal = ({ treatment, date, setTreatment }) => {
+const BookingModal = ({ treatment, date, setTreatment, refetch }) => {
   const [user, loading, error] = useAuthState(auth);
   const { name, slots, _id } = treatment;
   const formattedDate = format(date, "PP");
@@ -36,6 +36,7 @@ const BookingModal = ({ treatment, date, setTreatment }) => {
         } else {
           toast(`Appointment exists  ${formattedDate} at ${slot}`);
         }
+        refetch();
         setTreatment(null);
       });
   };
