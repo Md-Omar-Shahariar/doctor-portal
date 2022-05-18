@@ -8,6 +8,7 @@ import {
 import { useForm } from "react-hook-form";
 import Loading from "../Shared/Loading";
 import { Link, useNavigate } from "react-router-dom";
+import useToken from "../../Hooks/useToken";
 const SignUp = () => {
   const [createUserWithEmailAndPassword, user, loading, error] =
     useCreateUserWithEmailAndPassword(auth);
@@ -21,19 +22,21 @@ const SignUp = () => {
   } = useForm();
   const [updateProfile, updating, updateError] = useUpdateProfile(auth);
   const navigate = useNavigate();
+
+  const [token] = useToken(user || gUser);
+
   const onSubmit = async (data) => {
     await createUserWithEmailAndPassword(data.email, data.password);
 
     await updateProfile({ displayName: data.name });
     console.log("Updated");
-    navigate("/appointment");
   };
   let errorMessage;
   if (loading || gLoading || updating) {
     return <Loading></Loading>;
   }
-  if (user || gUser) {
-    console.log(user || gUser);
+  if (token) {
+    navigate("/appointment");
   }
   if (error || gError || updateError) {
     errorMessage = (
