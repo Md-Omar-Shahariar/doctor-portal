@@ -14,12 +14,13 @@ const BookingModal = ({ treatment, date, setTreatment, refetch }) => {
     const slot = event.target.slot.value;
     console.log(slots, name, _id);
     const booking = {
+      email: user?.email,
       treatmentId: _id,
       treatment: name,
       date: formattedDate,
-      slot,
-      PatientName: user.displayName,
-      phone: event.target.value,
+      slot: slot,
+      patientName: user.displayName,
+      phone: event.target.phone.value,
     };
     fetch("http://localhost:5000/booking", {
       method: "POST",
@@ -30,7 +31,7 @@ const BookingModal = ({ treatment, date, setTreatment, refetch }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         if (data?.success) {
           toast(`Appointment is set ${formattedDate} at ${slot}`);
         } else {
